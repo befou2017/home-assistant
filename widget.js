@@ -62,22 +62,38 @@
       };
     }
 
-    async function getState(entityId) {
-      const res = await fetch(`${config.url}/api/states/${entityId}`, {
-        headers: headers(),
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    async function fetchHA(url, options) {
+      let res;
+      try {
+        res = await fetch(url, options);
+      } catch (err) {
+        throw new Error(`Erreur réseau (vérifiez l'URL, le serveur ou CORS) : ${err.message}`);
+      }
+
+      if (!res.ok) {
+        if (res.status === 401) {
+          throw new Error('Non autorisé (Token invalide)');
+        } else if (res.status === 404) {
+          throw new Error('Entité introuvable (404)');
+        } else {
+          throw new Error(`Erreur HTTP ${res.status}`);
+        }
+      }
       return res.json();
     }
 
+    async function getState(entityId) {
+      return await fetchHA(`${config.url}/api/states/${entityId}`, {
+        headers: headers(),
+      });
+    }
+
     async function callService(domain, service, data) {
-      const res = await fetch(`${config.url}/api/services/${domain}/${service}`, {
+      return await fetchHA(`${config.url}/api/services/${domain}/${service}`, {
         method: 'POST',
         headers: headers(),
         body: JSON.stringify(data),
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return res.json();
     }
 
     // ── State ─────────────────────────────────────────────────────────
