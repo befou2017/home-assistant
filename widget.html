@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home Assistant – Bureau</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #1a1a2e;
+      color: #e0e0e0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .widget {
+      background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+      border-radius: 16px;
+      padding: 24px;
+      width: 300px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .widget-title {
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #94a3b8;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    /* ── Temperature section ── */
+    .temp-section {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .temp-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+    }
+
+    .temp-row + .temp-row {
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      margin-top: 6px;
+    }
+
+    .temp-label {
+      font-size: 13px;
+      color: #94a3b8;
+    }
+
+    .temp-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: #f97316;
+    }
+
+    .temp-value.target {
+      color: #38bdf8;
+    }
+
+    .temp-value.loading {
+      font-size: 14px;
+      color: #64748b;
+    }
+
+    /* ── Thermostat controls ── */
+    .thermostat-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .btn {
+      cursor: pointer;
+      border: none;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      font-size: 22px;
+      font-weight: 700;
+      transition: transform 0.1s, background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .btn:active {
+      transform: scale(0.92);
+    }
+
+    .btn-minus {
+      background: #1e3a5f;
+      color: #38bdf8;
+      border: 2px solid #38bdf8;
+    }
+
+    .btn-minus:hover {
+      background: #38bdf8;
+      color: #0f172a;
+    }
+
+    .btn-plus {
+      background: #1e3a5f;
+      color: #38bdf8;
+      border: 2px solid #38bdf8;
+    }
+
+    .btn-plus:hover {
+      background: #38bdf8;
+      color: #0f172a;
+    }
+
+    .target-display {
+      font-size: 28px;
+      font-weight: 700;
+      color: #38bdf8;
+      min-width: 80px;
+      text-align: center;
+    }
+
+    /* ── Light button ── */
+    .light-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      transition: background 0.3s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .light-btn:active {
+      transform: scale(0.97);
+    }
+
+    .light-btn.on {
+      background: #fbbf24;
+      color: #1a1a00;
+    }
+
+    .light-btn.off {
+      background: #1e293b;
+      color: #94a3b8;
+      border: 2px solid #334155;
+    }
+
+    .light-btn.loading {
+      background: #1e293b;
+      color: #64748b;
+      cursor: not-allowed;
+    }
+
+    .light-icon {
+      font-size: 20px;
+    }
+
+    /* ── Status / error ── */
+    .status {
+      font-size: 11px;
+      text-align: center;
+      color: #475569;
+      margin-bottom: 16px;
+      min-height: 14px;
+    }
+
+    .status.error {
+      color: #f87171;
+    }
+
+    /* ── Config panel ── */
+    .config-toggle {
+      text-align: center;
+      margin-top: 4px;
+    }
+
+    .config-toggle button {
+      background: none;
+      border: none;
+      color: #475569;
+      font-size: 12px;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .config-toggle button:hover {
+      color: #94a3b8;
+    }
+
+    .config-panel {
+      margin-top: 16px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 14px;
+      display: none;
+    }
+
+    .config-panel.open {
+      display: block;
+    }
+
+    .config-panel label {
+      display: block;
+      font-size: 11px;
+      color: #94a3b8;
+      margin-bottom: 2px;
+      margin-top: 10px;
+    }
+
+    .config-panel label:first-of-type {
+      margin-top: 0;
+    }
+
+    .config-panel input {
+      width: 100%;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 6px 8px;
+      color: #e0e0e0;
+      font-size: 12px;
+    }
+
+    .config-panel input:focus {
+      outline: none;
+      border-color: #38bdf8;
+    }
+
+    .config-save {
+      margin-top: 12px;
+      width: 100%;
+      padding: 8px;
+      background: #0284c7;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .config-save:hover {
+      background: #0369a1;
+    }
+  </style>
+</head>
+<body>
+  <div class="widget">
+    <div class="widget-title">🏠 Bureau – Home Assistant</div>
+
+    <!-- Temperature display -->
+    <div class="temp-section">
+      <div class="temp-row">
+        <span class="temp-label">Température actuelle</span>
+        <span class="temp-value loading" id="current-temp">…</span>
+      </div>
+      <div class="temp-row">
+        <span class="temp-label">Température cible</span>
+        <span class="temp-value target loading" id="target-temp-display">…</span>
+      </div>
+    </div>
+
+    <!-- Thermostat +/- controls -->
+    <div class="thermostat-controls">
+      <button class="btn btn-minus" id="btn-minus" title="Diminuer la cible de 1 °C">−</button>
+      <div class="target-display" id="target-temp-control">–</div>
+      <button class="btn btn-plus" id="btn-plus" title="Augmenter la cible de 1 °C">+</button>
+    </div>
+
+    <!-- Light toggle -->
+    <button class="light-btn loading" id="light-btn">
+      <span class="light-icon" id="light-icon">💡</span>
+      <span id="light-label">Chargement…</span>
+    </button>
+
+    <!-- Status -->
+    <div class="status" id="status"></div>
+
+    <!-- Config toggle -->
+    <div class="config-toggle">
+      <button id="toggle-config">⚙ Configuration</button>
+    </div>
+
+    <!-- Config panel -->
+    <div class="config-panel" id="config-panel">
+      <label>URL Home Assistant (ex: http://homeassistant.local:8123)</label>
+      <input type="text" id="cfg-url" placeholder="http://homeassistant.local:8123" />
+
+      <label>Token d'accès longue durée</label>
+      <input type="password" id="cfg-token" placeholder="eyJ0eXAi…" />
+
+      <label>Entité climatisation / thermostat (ex: climate.bureau)</label>
+      <input type="text" id="cfg-climate" placeholder="climate.bureau" />
+
+      <label>Entité lumière (ex: light.bureau)</label>
+      <input type="text" id="cfg-light" placeholder="light.bureau" />
+
+      <button class="config-save" id="config-save">💾 Enregistrer</button>
+    </div>
+  </div>
+
+  <script>
+    // ── Configuration ────────────────────────────────────────────────
+    const STORAGE_KEY = 'ha_widget_config';
+
+    function loadConfig() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+      } catch {
+        return {};
+      }
+    }
+
+    function saveConfig(cfg) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(cfg));
+    }
+
+    let config = loadConfig();
+
+    // Populate config inputs from stored values
+    function populateConfigInputs() {
+      document.getElementById('cfg-url').value = config.url || '';
+      document.getElementById('cfg-token').value = config.token || '';
+      document.getElementById('cfg-climate').value = config.climate || '';
+      document.getElementById('cfg-light').value = config.light || '';
+    }
+
+    populateConfigInputs();
+
+    // ── Config panel toggle ───────────────────────────────────────────
+    document.getElementById('toggle-config').addEventListener('click', () => {
+      document.getElementById('config-panel').classList.toggle('open');
+    });
+
+    document.getElementById('config-save').addEventListener('click', () => {
+      const rawUrl = document.getElementById('cfg-url').value.replace(/\/$/, '').trim();
+      try {
+        const parsed = new URL(rawUrl);
+        if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+          setStatus('URL invalide : seuls http et https sont acceptés.', true);
+          return;
+        }
+      } catch {
+        setStatus('URL invalide. Exemple : http://homeassistant.local:8123', true);
+        return;
+      }
+      config = {
+        url: rawUrl,
+        token: document.getElementById('cfg-token').value,
+        climate: document.getElementById('cfg-climate').value.trim(),
+        light: document.getElementById('cfg-light').value.trim(),
+      };
+      saveConfig(config);
+      document.getElementById('config-panel').classList.remove('open');
+      setStatus('Configuration enregistrée.', false);
+      refresh();
+    });
+
+    // ── API helpers ───────────────────────────────────────────────────
+    function headers() {
+      return {
+        'Authorization': `Bearer ${config.token}`,
+        'Content-Type': 'application/json',
+      };
+    }
+
+    async function getState(entityId) {
+      const res = await fetch(`${config.url}/api/states/${entityId}`, {
+        headers: headers(),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    }
+
+    async function callService(domain, service, data) {
+      const res = await fetch(`${config.url}/api/services/${domain}/${service}`, {
+        method: 'POST',
+        headers: headers(),
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    }
+
+    // ── State ─────────────────────────────────────────────────────────
+    let currentTemp = null;
+    let targetTemp = null;
+    let lightOn = null;
+
+    function setStatus(msg, isError = false) {
+      const el = document.getElementById('status');
+      el.textContent = msg;
+      el.className = 'status' + (isError ? ' error' : '');
+    }
+
+    function renderTemps() {
+      const curEl = document.getElementById('current-temp');
+      const tgtEl = document.getElementById('target-temp-display');
+      const ctrlEl = document.getElementById('target-temp-control');
+
+      if (currentTemp !== null) {
+        curEl.textContent = `${currentTemp} °C`;
+        curEl.classList.remove('loading');
+      } else {
+        curEl.textContent = '…';
+        curEl.classList.add('loading');
+      }
+
+      if (targetTemp !== null) {
+        tgtEl.textContent = `${targetTemp} °C`;
+        tgtEl.classList.remove('loading');
+        ctrlEl.textContent = `${targetTemp} °C`;
+      } else {
+        tgtEl.textContent = '…';
+        tgtEl.classList.add('loading');
+        ctrlEl.textContent = '–';
+      }
+    }
+
+    function renderLight() {
+      const btn = document.getElementById('light-btn');
+      const icon = document.getElementById('light-icon');
+      const label = document.getElementById('light-label');
+
+      btn.classList.remove('on', 'off', 'loading');
+
+      if (lightOn === null) {
+        btn.classList.add('loading');
+        icon.textContent = '💡';
+        label.textContent = 'Chargement…';
+      } else if (lightOn) {
+        btn.classList.add('on');
+        icon.textContent = '💡';
+        label.textContent = 'Lumière allumée – Éteindre';
+      } else {
+        btn.classList.add('off');
+        icon.textContent = '🌑';
+        label.textContent = 'Lumière éteinte – Allumer';
+      }
+    }
+
+    // ── Fetch & refresh ───────────────────────────────────────────────
+    async function refresh() {
+      if (!config.url || !config.token) {
+        setStatus('Configurez l\'URL et le token ci-dessous.', true);
+        return;
+      }
+
+      try {
+        const promises = [];
+
+        if (config.climate) {
+          promises.push(
+            getState(config.climate).then(data => {
+              currentTemp = data.attributes.current_temperature ?? null;
+              targetTemp = data.attributes.temperature ?? null;
+            })
+          );
+        }
+
+        if (config.light) {
+          promises.push(
+            getState(config.light).then(data => {
+              lightOn = data.state === 'on';
+            })
+          );
+        }
+
+        await Promise.all(promises);
+        setStatus(`Mis à jour : ${new Date().toLocaleTimeString('fr-FR')}`);
+      } catch (err) {
+        setStatus(`Erreur : ${err.message}`, true);
+      }
+
+      renderTemps();
+      renderLight();
+    }
+
+    // ── Buttons ───────────────────────────────────────────────────────
+    document.getElementById('btn-minus').addEventListener('click', async () => {
+      if (!config.climate || targetTemp === null) return;
+      const newTemp = targetTemp - 1;
+      try {
+        await callService('climate', 'set_temperature', {
+          entity_id: config.climate,
+          temperature: newTemp,
+        });
+        targetTemp = newTemp;
+        renderTemps();
+        setStatus(`Température réglée à ${newTemp} °C`);
+      } catch (err) {
+        setStatus(`Erreur : ${err.message}`, true);
+      }
+    });
+
+    document.getElementById('btn-plus').addEventListener('click', async () => {
+      if (!config.climate || targetTemp === null) return;
+      const newTemp = targetTemp + 1;
+      try {
+        await callService('climate', 'set_temperature', {
+          entity_id: config.climate,
+          temperature: newTemp,
+        });
+        targetTemp = newTemp;
+        renderTemps();
+        setStatus(`Température réglée à ${newTemp} °C`);
+      } catch (err) {
+        setStatus(`Erreur : ${err.message}`, true);
+      }
+    });
+
+    document.getElementById('light-btn').addEventListener('click', async () => {
+      if (!config.light || lightOn === null) return;
+      try {
+        const service = lightOn ? 'turn_off' : 'turn_on';
+        await callService('light', service, { entity_id: config.light });
+        lightOn = !lightOn;
+        renderLight();
+        setStatus(`Lumière ${lightOn ? 'allumée' : 'éteinte'}`);
+      } catch (err) {
+        setStatus(`Erreur : ${err.message}`, true);
+      }
+    });
+
+    // ── Initial load & auto-refresh every 30 s ────────────────────────
+    refresh();
+    setInterval(refresh, 30000);
+  </script>
+</body>
+</html>
