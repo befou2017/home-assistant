@@ -1,0 +1,262 @@
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #1a1a2e;
+      color: #e0e0e0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .widget {
+      background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+      border-radius: 16px;
+      padding: 24px;
+      width: 300px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .widget-title {
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #94a3b8;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    /* ── Temperature section ── */
+    .temp-section {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .temp-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+    }
+
+    .temp-row + .temp-row {
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      margin-top: 6px;
+    }
+
+    .temp-label {
+      font-size: 13px;
+      color: #94a3b8;
+    }
+
+    .temp-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: #f97316;
+    }
+
+    .temp-value.target {
+      color: #38bdf8;
+    }
+
+    .temp-value.loading {
+      font-size: 14px;
+      color: #64748b;
+    }
+
+    /* ── Thermostat controls ── */
+    .thermostat-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .btn {
+      cursor: pointer;
+      border: none;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      font-size: 22px;
+      font-weight: 700;
+      transition: transform 0.1s, background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .btn:active {
+      transform: scale(0.92);
+    }
+
+    .btn-minus {
+      background: #1e3a5f;
+      color: #38bdf8;
+      border: 2px solid #38bdf8;
+    }
+
+    .btn-minus:hover {
+      background: #38bdf8;
+      color: #0f172a;
+    }
+
+    .btn-plus {
+      background: #1e3a5f;
+      color: #38bdf8;
+      border: 2px solid #38bdf8;
+    }
+
+    .btn-plus:hover {
+      background: #38bdf8;
+      color: #0f172a;
+    }
+
+    .target-display {
+      font-size: 28px;
+      font-weight: 700;
+      color: #38bdf8;
+      min-width: 80px;
+      text-align: center;
+    }
+
+    /* ── Light button ── */
+    .light-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      transition: background 0.3s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .light-btn:active {
+      transform: scale(0.97);
+    }
+
+    .light-btn.on {
+      background: #fbbf24;
+      color: #1a1a00;
+    }
+
+    .light-btn.off {
+      background: #1e293b;
+      color: #94a3b8;
+      border: 2px solid #334155;
+    }
+
+    .light-btn.loading {
+      background: #1e293b;
+      color: #64748b;
+      cursor: not-allowed;
+    }
+
+    .light-icon {
+      font-size: 20px;
+    }
+
+    /* ── Status / error ── */
+    .status {
+      font-size: 11px;
+      text-align: center;
+      color: #475569;
+      margin-bottom: 16px;
+      min-height: 14px;
+    }
+
+    .status.error {
+      color: #f87171;
+    }
+
+    /* ── Config panel ── */
+    .config-toggle {
+      text-align: center;
+      margin-top: 4px;
+    }
+
+    .config-toggle button {
+      background: none;
+      border: none;
+      color: #475569;
+      font-size: 12px;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .config-toggle button:hover {
+      color: #94a3b8;
+    }
+
+    .config-panel {
+      margin-top: 16px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 14px;
+      display: none;
+    }
+
+    .config-panel.open {
+      display: block;
+    }
+
+    .config-panel label {
+      display: block;
+      font-size: 11px;
+      color: #94a3b8;
+      margin-bottom: 2px;
+      margin-top: 10px;
+    }
+
+    .config-panel label:first-of-type {
+      margin-top: 0;
+    }
+
+    .config-panel input {
+      width: 100%;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 6px 8px;
+      color: #e0e0e0;
+      font-size: 12px;
+    }
+
+    .config-panel input:focus {
+      outline: none;
+      border-color: #38bdf8;
+    }
+
+    .config-save {
+      margin-top: 12px;
+      width: 100%;
+      padding: 8px;
+      background: #0284c7;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .config-save:hover {
+      background: #0369a1;
+    }
