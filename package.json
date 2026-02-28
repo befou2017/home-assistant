@@ -1,0 +1,26 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "Widget for home assistant",
+  "main": "dist/widget.bundle.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx esbuild src/main.ts --bundle --outfile=dist/widget.bundle.js --target=es2020 --format=iife"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/befou2017/home-assistant.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/befou2017/home-assistant/issues"
+  },
+  "homepage": "https://github.com/befou2017/home-assistant#readme",
+  "devDependencies": {
+    "esbuild": "^0.27.3",
+    "typescript": "^5.9.3"
+  }
+}
