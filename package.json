@@ -2,8 +2,9 @@
   "name": "app",
   "version": "1.0.0",
   "description": "Widget for home assistant",
-  "main": "dist/widget.bundle.js",
+  "main": "server.js",
   "scripts": {
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npx esbuild src/main.ts --bundle --outfile=dist/widget.bundle.js --target=es2020 --format=iife"
   },
@@ -22,5 +23,8 @@
   "devDependencies": {
     "esbuild": "^0.27.3",
     "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
   }
 }
