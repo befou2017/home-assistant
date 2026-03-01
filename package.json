@@ -2,8 +2,9 @@
   "name": "app",
   "version": "1.0.0",
   "description": "Widget for home assistant",
-  "main": "dist/widget.bundle.js",
+  "main": "server.ts",
   "scripts": {
+    "start": "tsx server.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npx esbuild src/main.ts --bundle --outfile=dist/widget.bundle.js --target=es2020 --format=iife"
   },
@@ -20,7 +21,13 @@
   },
   "homepage": "https://github.com/befou2017/home-assistant#readme",
   "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.3.3",
     "esbuild": "^0.27.3",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
   }
 }
